@@ -1,6 +1,6 @@
 import {React, useState, useEffect} from "react";
 import {useParams} from "react-router-dom";
-import Avatar from "@mui/material/Avatar"; // Doğrusu budur
+import Avatar from "../Avatar/Avatar"; 
 import UserActivity from "../UserActivity/UserActivity";
 import { makeStyles } from '@mui/styles';
 import { GetWithAuth } from "../../services/HttpService";

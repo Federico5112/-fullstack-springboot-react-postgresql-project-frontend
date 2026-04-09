@@ -11,16 +11,14 @@ import Typography from '@mui/material/Typography';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import CommentIcon from '@mui/icons-material/ModeComment';
 import { Link } from "react-router-dom";
-import { PostWithAuth, DeleteWithAuth } from "../../services/HttpService";
+import { PostWithAuth, DeleteWithAuth, RefreshToken } from "../../services/HttpService";
 import Comment from "../Comment/Comment";
 import CommentForm from "../Comment/CommentForm";
 
 const ExpandMore = styled((props) => {
-
-    const {  ...other } = props;
+    const { expand, ...other } = props; // expand prop'unu DOM'a geçmemesi için burada süzüyoruz
     return <IconButton {...other} />;
 })(({ theme, expand }) => ({
-
     transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
     marginLeft: 'auto',
     transition: theme.transitions.create('transform', {
@@ -63,7 +61,7 @@ function Post(props) {
     };
 
     const refreshComments = () => {
-        fetch("/comments?postId=" + postId)
+        fetch("/api/comments?postId=" + postId) // /api EKLENDİ
             .then((res) => res.json())
             .then(
                 (result) => {
@@ -76,18 +74,51 @@ function Post(props) {
                     setError(error);
                 }
             );
-        setRefresh(false);
+        // setRefresh(false); BURADAN SİLİNDİ, ÇÜNKÜ useEffect İÇİNE TAŞIDIK
     };
+
 
     const saveLike = () => {
         PostWithAuth("/likes", {
             postId: postId,
             userId: localStorage.getItem("currentUser"),
         })
-            .then((res) => res.json())
-            .then((catchError) => console.log(catchError));
+            .then((res) => {
+                if (!res.ok) {
+                    // Token süresi dolmuş olabilir, yenilemeyi dene
+                    RefreshToken()
+                        .then((res) => {
+                            if (!res.ok) {
+                                // Yenileme de başarısızsa yetkileri temizle ve sayfayı yenile
+                                localStorage.removeItem("tokenKey");
+                                localStorage.removeItem("currentUser");
+                                localStorage.removeItem("refreshKey");
+                                localStorage.removeItem("userName");
+                                window.location.reload();
+                            } else {
+                                return res.json();
+                            }
+                        })
+                        .then((result) => {
+                            if (result != undefined) {
+                                localStorage.setItem("tokenKey", result.accessToken);
+                                saveLike(); // Yeni token ile like işlemini tekrar dene
+                            }
+                        })
+                        .catch((err) => console.log("Refresh Hatası:", err));
+                } else {
+                    return res.json();
+                }
+            })
+            .then((data) => {
+                // Başarılı kayıttan sonra veritabanı ID'sini state'e ata
+                // Böylece unlike yapmak istenildiğinde doğru ID silinebilir
+                if (data && data.id) {
+                    setLikeId(data.id);
+                }
+            })
+            .catch((err) => console.log("Like kayıt hatası:", err));
     };
-
     const deleteLike = () => {
         DeleteWithAuth("/likes/" + likeId)
             .catch((err) => console.log(err));
@@ -101,11 +132,11 @@ function Post(props) {
         }
     };
 
+// YENİ VE GÜVENLİ YAPI
     useEffect(() => {
-        if (isInitialMount.current) {
-            isInitialMount.current = false;
-        } else {
+        if (refresh) {
             refreshComments();
+            setRefresh(false); // Sadece true olduğunda çalışıp false'a çeker, döngü oluşmaz
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [refresh]);

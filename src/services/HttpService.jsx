@@ -3,7 +3,7 @@ export const PostWithAuth = (url, body) => {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": localStorage.getItem("tokenKey"),
+            "Authorization": "Bearer " + localStorage.getItem("tokenKey")
         },
         body: JSON.stringify(body),
     });
@@ -24,7 +24,7 @@ export const PutWithAuth = (url, body) => {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": localStorage.getItem("tokenKey"),
+            "Authorization": "Bearer " + localStorage.getItem("tokenKey")
         },
         body: JSON.stringify(body),
     });
@@ -35,7 +35,7 @@ export const GetWithAuth = (url) => {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": localStorage.getItem("tokenKey"),
+            "Authorization": "Bearer " + localStorage.getItem("tokenKey")
         },
     });
 }
@@ -45,7 +45,7 @@ export const DeleteWithAuth = (url) => {
         method: "DELETE",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": localStorage.getItem("tokenKey"),
+            "Authorization": "Bearer " + localStorage.getItem("tokenKey")
         },
     });
 }

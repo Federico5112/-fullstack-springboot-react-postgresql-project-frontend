@@ -17,9 +17,13 @@ function CommentForm(props) {
     }
 
     const saveComment = () => {
+        // Güvenlik: userId'yi havada kaybolabilen proplardan değil,
+        // doğrudan kullanıcının kesin giriş bilgisinden (localStorage) alıyoruz.
+        const currentUserId = localStorage.getItem("currentUser");
+
         PostWithAuth("/comments", {
             postId: postId,
-            userId: userId,
+            userId: currentUserId,
             text: text,
         })
             .then((res) => {
@@ -35,27 +39,33 @@ function CommentForm(props) {
                         .then((result) => {
                             if (result != undefined) {
                                 localStorage.setItem("tokenKey", result.accessToken);
-                                saveComment();
+                                saveComment(); // Yeni token ile tekrar dene
                                 setCommentRefresh();
                             }
                         })
-                        .catch((err) => {
-                            console.log(err);
-                        })
-                } else
-                    res.json();
+                        .catch((err) => console.log("Refresh Token Hatası:", err));
+                } else {
+                    // res.json() sadece yazılıp bırakılmaz, return edilmesi gerekir
+                    return res.json();
+                }
+            })
+            .then((data) => {
+                // Eğer başarılıysa ve data geldiyse formu temizle
+                if (data) {
+                    setText("");
+                    setCommentRefresh();
+                }
             })
             .catch((err) => {
-                console.log(err);
+                console.log("Yorum Kayıt Hatası:", err);
             })
     }
 
     const handleSubmit = () => {
         saveComment();
-        setText("");
-        setCommentRefresh();
+        // setText("") ve setCommentRefresh() kısımlarını sildik,
+        // çünkü işlem asenkron. Veritabanına kaydolmadan formu temizlememeliyiz.
     }
-
     const handleChange = (value) => {
         setText(value);
     }

@@ -15,7 +15,7 @@ import Typography from '@mui/material/Typography';
 import CloseIcon from '@mui/icons-material/Close';
 import Slide from '@mui/material/Slide';
 import Post from "../Post/Post";
-import { GetWithAuth } from '../../services/HttpService';
+import { GetWithAuth, RefreshToken } from '../../services/HttpService';
 
 
 const Transition = forwardRef(function Transition(props, ref) {
@@ -93,21 +93,47 @@ function UserActivity(props) {
 
     const getActivity = () => {
         GetWithAuth("/users/activity/" + userId)
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    setIsLoaded(true);
-                    console.log(result);
-                    setRows(result)
-                },
-                (error) => {
-                    console.log(error)
-                    setIsLoaded(true);
-                    setError(error);
+            .then(res => {
+                if (!res.ok) {
+                    // 401 Hatası: Token süresi dolmuş, yenilemeyi dene
+                    RefreshToken()
+                        .then((res) => {
+                            if (!res.ok) {
+                                // Yenileme de başarısızsa yetkileri temizle ve sayfayı yenile
+                                localStorage.removeItem("tokenKey");
+                                localStorage.removeItem("currentUser");
+                                localStorage.removeItem("refreshKey");
+                                localStorage.removeItem("userName");
+                                window.location.reload();
+                            } else {
+                                return res.json();
+                            }
+                        })
+                        .then((result) => {
+                            if (result != undefined) {
+                                localStorage.setItem("tokenKey", result.accessToken);
+                                getActivity(); // Yeni token ile aktiviteyi tekrar çek
+                            }
+                        })
+                        .catch((err) => console.log("Refresh Hatası:", err));
+                } else {
+                    return res.json();
                 }
-            )
+            })
+            .then((data) => {
+                // Veri başarıyla geldiyse state'e yaz
+                if (data) {
+                    setIsLoaded(true);
+                    setRows(data);
+                }
+            })
+            .catch((error) => {
+                console.log("Aktivite çekme hatası:", error);
+                setIsLoaded(true);
+                setError(error);
+                setRows([]);
+            });
     }
-
     useEffect(() => {
         getActivity()
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -125,17 +151,26 @@ function UserActivity(props) {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {rows.map((row, index) => {
-                                return (
-                                    <TableRow hover role="checkbox" tabIndex={-1} key={index}>
-                                        <TableCell align="left">
-                                            <Button onClick={() => handleNotification(row[1])} sx={{ textTransform: 'none', width: '100%', justifyContent: 'flex-start' }}>
-                                                {row[3] + " " + row[0] + " your post"}
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                );
-                            })}
+                            {/* Veri yükleniyorsa veya hata varsa çökmesini engelliyoruz */}
+                            {error ? (
+                                <TableRow><TableCell>Aktiviteler yüklenemedi.</TableCell></TableRow>
+                            ) : !isLoaded ? (
+                                <TableRow><TableCell>Yükleniyor...</TableCell></TableRow>
+                            ) : Array.isArray(rows) && rows.length > 0 ? (
+                                rows.map((row, index) => {
+                                    return (
+                                        <TableRow hover role="checkbox" tabIndex={-1} key={index}>
+                                            <TableCell align="left">
+                                                <Button onClick={() => handleNotification(row[1])} sx={{ textTransform: 'none', width: '100%', justifyContent: 'flex-start' }}>
+                                                    {row[3] + " " + row[0] + " your post"}
+                                                </Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })
+                            ) : (
+                                <TableRow><TableCell>Henüz bir aktivite bulunmuyor.</TableCell></TableRow>
+                            )}
                         </TableBody>
                     </Table>
                 </TableContainer>

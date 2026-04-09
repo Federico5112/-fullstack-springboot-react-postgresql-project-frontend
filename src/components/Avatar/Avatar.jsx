@@ -1,15 +1,17 @@
-import {React, useState} from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import Card from '@material-ui/core/Card';
-import Modal from '@material-ui/core/Modal';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import CardMedia from '@material-ui/core/CardMedia';
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
-import {ListItem, List, ListItemSecondaryAction, Radio} from '@material-ui/core';
-import { PutWithAuth } from '../../services/HttpService';
+import React, { useState } from 'react';
+// Eski @material-ui/core yerine güncel @mui kütüphanelerini import ediyoruz
+import { makeStyles } from '@mui/styles';
+import Card from '@mui/material/Card';
+import Modal from '@mui/material/Modal'; // ÇÖKÜŞÜ ENGELLEYEN ANA GÜNCELLEME
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@mui/material/CardMedia';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import { ListItem, List, ListItemSecondaryAction, Radio } from '@mui/material';
+import { PutWithAuth, RefreshToken } from '../../services/HttpService';
 
+// ... Kodun geri kalanı (useStyles, fonksiyonlar vs.) aynı kalacak
 const useStyles = makeStyles({
     root: {
         maxWidth: 345,
@@ -28,11 +30,35 @@ function Avatar(props) {
     const [selectedValue, setSelectedValue] = useState(avatarId);
 
     const saveAvatar = () => {
-        PutWithAuth("/users/"+localStorage.getItem("currentUser"), {
+        PutWithAuth("/users/" + localStorage.getItem("currentUser"), {
             avatar: selectedValue,
         })
-            .then((res) => res.json())
-            .catch((err) => console.log(err))
+            .then((res) => {
+                if (!res.ok) {
+                    RefreshToken()
+                        .then((res) => {
+                            if (!res.ok) {
+                                localStorage.removeItem("tokenKey");
+                                localStorage.removeItem("currentUser");
+                                localStorage.removeItem("refreshKey");
+                                localStorage.removeItem("userName");
+                                window.location.reload();
+                            } else {
+                                return res.json();
+                            }
+                        })
+                        .then((result) => {
+                            if (result != undefined) {
+                                localStorage.setItem("tokenKey", result.accessToken);
+                                saveAvatar(); // Yeni token ile resmi kaydetmeyi tekrar dene
+                            }
+                        })
+                        .catch((err) => console.log("Refresh Hatası:", err));
+                } else {
+                    return res.json();
+                }
+            })
+            .catch((err) => console.log("Avatar Kayıt Hatası:", err))
     }
 
 

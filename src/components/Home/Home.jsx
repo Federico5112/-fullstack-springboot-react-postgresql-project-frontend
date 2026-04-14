@@ -39,7 +39,7 @@ function Home() {
                 flexWrap: "wrap",
                 justifyContent: "center",
                 alignItems: "center",
-                backgroundColor: '#f0f5ff',
+                backgroundColor: '',
             }}>
                 {localStorage.getItem("currentUser") == null ? "" :
                     <PostForm userId={localStorage.getItem("currentUser")} userName={localStorage.getItem("userName")} refreshPosts={refreshPosts} />

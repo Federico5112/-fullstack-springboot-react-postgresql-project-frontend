@@ -4,10 +4,12 @@ import Navbar from './components/Navbar/Navbar';
 import Home from './components/Home/Home';
 import User from './components/User/User';
 import Auth from './components/Auth/Auth';
+import { Box } from '@mui/material';
 
 function App() {
     return (
-        <div className="App">
+        // Box kullanarak arkaplanı (bgcolor) doğrudan MUI temasına bağladık
+        <Box sx={{ bgcolor: 'background.default', color: 'text.primary', minHeight: '100vh' }} className="App">
             <BrowserRouter>
                 <Navbar />
                 <Routes>
@@ -18,7 +20,7 @@ function App() {
                     } />
                 </Routes>
             </BrowserRouter>
-        </div>
+        </Box>
     );
 }
 

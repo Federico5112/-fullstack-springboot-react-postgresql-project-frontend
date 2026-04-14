@@ -11,7 +11,6 @@ import Typography from '@mui/material/Typography';
 import { ListItem, List, ListItemSecondaryAction, Radio } from '@mui/material';
 import { PutWithAuth, RefreshToken } from '../../services/HttpService';
 
-// ... Kodun geri kalanı (useStyles, fonksiyonlar vs.) aynı kalacak
 const useStyles = makeStyles({
     root: {
         maxWidth: 345,
@@ -50,7 +49,7 @@ function Avatar(props) {
                         .then((result) => {
                             if (result != undefined) {
                                 localStorage.setItem("tokenKey", result.accessToken);
-                                saveAvatar(); // Yeni token ile resmi kaydetmeyi tekrar dene
+                                saveAvatar();
                             }
                         })
                         .catch((err) => console.log("Refresh Hatası:", err));

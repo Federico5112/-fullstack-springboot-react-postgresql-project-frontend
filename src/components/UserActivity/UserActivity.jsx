@@ -55,7 +55,7 @@ function PopUp(props) {
         if (postId) {
             getPost();
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+
     }, [postId])
 
     return (
@@ -77,13 +77,13 @@ function PopUp(props) {
 }
 
 function UserActivity(props) {
-    // eslint-disable-next-line no-unused-vars
+
     const [error, setError] = useState(null);
-    // eslint-disable-next-line no-unused-vars
+
     const [isLoaded, setIsLoaded] = useState(false);
     const [rows, setRows] = useState([]);
     const { userId } = props;
-    const [isOpen, setIsOpen] = useState(false); // Tip uyuşmazlığı giderildi
+    const [isOpen, setIsOpen] = useState(false);
     const [selectedPost, setSelectedPost] = useState(null);
 
     const handleNotification = (postId) => {
@@ -95,11 +95,11 @@ function UserActivity(props) {
         GetWithAuth("/users/activity/" + userId)
             .then(res => {
                 if (!res.ok) {
-                    // 401 Hatası: Token süresi dolmuş, yenilemeyi dene
+
                     RefreshToken()
                         .then((res) => {
                             if (!res.ok) {
-                                // Yenileme de başarısızsa yetkileri temizle ve sayfayı yenile
+
                                 localStorage.removeItem("tokenKey");
                                 localStorage.removeItem("currentUser");
                                 localStorage.removeItem("refreshKey");
@@ -112,7 +112,7 @@ function UserActivity(props) {
                         .then((result) => {
                             if (result != undefined) {
                                 localStorage.setItem("tokenKey", result.accessToken);
-                                getActivity(); // Yeni token ile aktiviteyi tekrar çek
+                                getActivity();
                             }
                         })
                         .catch((err) => console.log("Refresh Hatası:", err));
@@ -121,7 +121,7 @@ function UserActivity(props) {
                 }
             })
             .then((data) => {
-                // Veri başarıyla geldiyse state'e yaz
+
                 if (data) {
                     setIsLoaded(true);
                     setRows(data);
@@ -136,7 +136,7 @@ function UserActivity(props) {
     }
     useEffect(() => {
         getActivity()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+
     }, [])
 
     return (
@@ -151,7 +151,7 @@ function UserActivity(props) {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {/* Veri yükleniyorsa veya hata varsa çökmesini engelliyoruz */}
+                            {}
                             {error ? (
                                 <TableRow><TableCell>Aktiviteler yüklenemedi.</TableCell></TableRow>
                             ) : !isLoaded ? (

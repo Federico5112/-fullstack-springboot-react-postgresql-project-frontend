@@ -61,7 +61,7 @@ function Post(props) {
     };
 
     const refreshComments = () => {
-        fetch("/api/comments?postId=" + postId) // /api EKLENDİ
+        fetch("/api/comments?postId=" + postId)
             .then((res) => res.json())
             .then(
                 (result) => {
@@ -74,7 +74,6 @@ function Post(props) {
                     setError(error);
                 }
             );
-        // setRefresh(false); BURADAN SİLİNDİ, ÇÜNKÜ useEffect İÇİNE TAŞIDIK
     };
 
 
@@ -85,11 +84,10 @@ function Post(props) {
         })
             .then((res) => {
                 if (!res.ok) {
-                    // Token süresi dolmuş olabilir, yenilemeyi dene
                     RefreshToken()
                         .then((res) => {
                             if (!res.ok) {
-                                // Yenileme de başarısızsa yetkileri temizle ve sayfayı yenile
+
                                 localStorage.removeItem("tokenKey");
                                 localStorage.removeItem("currentUser");
                                 localStorage.removeItem("refreshKey");
@@ -102,7 +100,7 @@ function Post(props) {
                         .then((result) => {
                             if (result != undefined) {
                                 localStorage.setItem("tokenKey", result.accessToken);
-                                saveLike(); // Yeni token ile like işlemini tekrar dene
+                                saveLike();
                             }
                         })
                         .catch((err) => console.log("Refresh Hatası:", err));
@@ -111,8 +109,6 @@ function Post(props) {
                 }
             })
             .then((data) => {
-                // Başarılı kayıttan sonra veritabanı ID'sini state'e ata
-                // Böylece unlike yapmak istenildiğinde doğru ID silinebilir
                 if (data && data.id) {
                     setLikeId(data.id);
                 }
@@ -132,18 +128,16 @@ function Post(props) {
         }
     };
 
-// YENİ VE GÜVENLİ YAPI
+
     useEffect(() => {
         if (refresh) {
             refreshComments();
-            setRefresh(false); // Sadece true olduğunda çalışıp false'a çeker, döngü oluşmaz
+            setRefresh(false);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [refresh]);
 
     useEffect(() => {
         checkLikes();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (

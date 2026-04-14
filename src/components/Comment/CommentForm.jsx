@@ -17,8 +17,7 @@ function CommentForm(props) {
     }
 
     const saveComment = () => {
-        // Güvenlik: userId'yi havada kaybolabilen proplardan değil,
-        // doğrudan kullanıcının kesin giriş bilgisinden (localStorage) alıyoruz.
+
         const currentUserId = localStorage.getItem("currentUser");
 
         PostWithAuth("/comments", {
@@ -39,18 +38,18 @@ function CommentForm(props) {
                         .then((result) => {
                             if (result != undefined) {
                                 localStorage.setItem("tokenKey", result.accessToken);
-                                saveComment(); // Yeni token ile tekrar dene
+                                saveComment();
                                 setCommentRefresh();
                             }
                         })
                         .catch((err) => console.log("Refresh Token Hatası:", err));
                 } else {
-                    // res.json() sadece yazılıp bırakılmaz, return edilmesi gerekir
+
                     return res.json();
                 }
             })
             .then((data) => {
-                // Eğer başarılıysa ve data geldiyse formu temizle
+
                 if (data) {
                     setText("");
                     setCommentRefresh();
@@ -63,8 +62,6 @@ function CommentForm(props) {
 
     const handleSubmit = () => {
         saveComment();
-        // setText("") ve setCommentRefresh() kısımlarını sildik,
-        // çünkü işlem asenkron. Veritabanına kaydolmadan formu temizlememeliyiz.
     }
     const handleChange = (value) => {
         setText(value);

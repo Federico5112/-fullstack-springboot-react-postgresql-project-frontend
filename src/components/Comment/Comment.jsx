@@ -21,14 +21,22 @@ function Comment(props) {
                 value={text}
                 startAdornment={
                     <InputAdornment position="start">
-                        <Link style={{ textDecoration: "none", boxShadow: "none", color: "white" }} to={{ pathname: '/users/' + userId }}>
-                            <Avatar aria-label="recipe" sx={{ width: 32, height: 32 }}>
+                        <Link style={{ textDecoration: "none", boxShadow: "none" }} to={{ pathname: '/users/' + userId }}>
+                            <Avatar aria-label="recipe" sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
                                 {userName ? userName.charAt(0).toUpperCase() : ""}
                             </Avatar>
                         </Link>
                     </InputAdornment>
                 }
-                style={{ color: "black", backgroundColor: 'white' }}
+                sx={{
+
+                    color: 'text.primary',
+                    backgroundColor: 'background.paper',
+
+                    '& .MuiInputBase-input.Mui-disabled': {
+                        WebkitTextFillColor: (theme) => theme.palette.text.primary,
+                    }
+                }}
             />
         </CardContent>
     )

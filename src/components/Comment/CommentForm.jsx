@@ -17,7 +17,6 @@ function CommentForm(props) {
     }
 
     const saveComment = () => {
-
         const currentUserId = localStorage.getItem("currentUser");
 
         PostWithAuth("/comments", {
@@ -44,12 +43,10 @@ function CommentForm(props) {
                         })
                         .catch((err) => console.log("Refresh Token Hatası:", err));
                 } else {
-
                     return res.json();
                 }
             })
             .then((data) => {
-
                 if (data) {
                     setText("");
                     setCommentRefresh();
@@ -82,8 +79,8 @@ function CommentForm(props) {
                 onChange={(i) => handleChange(i.target.value)}
                 startAdornment={
                     <InputAdornment position="start">
-                        <Link style={{ textDecoration: "none", boxShadow: "none", color: "white" }} to={{ pathname: '/users/' + userId }}>
-                            <Avatar aria-label="recipe" sx={{ width: 32, height: 32 }}>
+                        <Link style={{ textDecoration: "none", boxShadow: "none" }} to={{ pathname: '/users/' + userId }}>
+                            <Avatar aria-label="recipe" sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
                                 {userName ? userName.charAt(0).toUpperCase() : ""}
                             </Avatar>
                         </Link>
@@ -102,7 +99,7 @@ function CommentForm(props) {
                     </InputAdornment>
                 }
                 value={text}
-                style={{ color: "black", backgroundColor: 'white' }}
+                sx={{ color: 'text.primary', backgroundColor: 'background.paper' }}
             />
         </CardContent>
     )

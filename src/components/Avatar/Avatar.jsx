@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-// Eski @material-ui/core yerine güncel @mui kütüphanelerini import ediyoruz
 import { makeStyles } from '@mui/styles';
 import Card from '@mui/material/Card';
-import Modal from '@mui/material/Modal'; // ÇÖKÜŞÜ ENGELLEYEN ANA GÜNCELLEME
+import Modal from '@mui/material/Modal';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';

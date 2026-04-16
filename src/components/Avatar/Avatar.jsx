@@ -28,11 +28,22 @@ function Avatar(props) {
     const [selectedValue, setSelectedValue] = useState(avatarId);
 
     const saveAvatar = () => {
-        PutWithAuth("/users/" + localStorage.getItem("currentUser"), {
+        const userId = localStorage.getItem("currentUser");
+
+
+        if (!userId) {
+            console.error("Kullanıcı ID bulunamadı, login işlemi hatalı!");
+            return;
+        }
+
+        PutWithAuth(`/users/${userId}/avatar`, {
             avatar: selectedValue,
         })
             .then((res) => {
-                if (!res.ok) {
+                if (res.ok) {
+                    localStorage.setItem("avatarId", selectedValue);
+                    window.location.reload();
+                    
                     RefreshToken()
                         .then((res) => {
                             if (!res.ok) {

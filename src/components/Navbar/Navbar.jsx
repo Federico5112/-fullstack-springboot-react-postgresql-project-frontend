@@ -9,9 +9,8 @@ import LockOpen from '@mui/icons-material/LockOpen';
 import { Box } from "@mui/material";
 
 import { useTheme } from '@mui/material/styles';
-import Brightness4Icon from '@mui/icons-material/Brightness4'; // Ay ikonu
-import Brightness7Icon from '@mui/icons-material/Brightness7'; // Güneş ikonu
-// NOT: Klasör yolunu kendi yapına göre ('../../theme/ThemeContext' veya '../theme/ThemeContext') kontrol et.
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
 import { useColorMode } from '../../theme/ThemeContext';
 
 function Navbar() {
@@ -22,11 +21,14 @@ function Navbar() {
         localStorage.removeItem("currentUser");
         localStorage.removeItem("refreshKey");
         localStorage.removeItem("userName");
+        localStorage.removeItem("avatarId"); // Çıkış yaparken avatar verisini de temizle
         navigate(0);
     }
 
     const theme = useTheme();
     const { toggleColorMode } = useColorMode();
+
+    const currentAvatar = localStorage.getItem("avatarId") || 1;
 
     return (
         <div>
@@ -36,19 +38,18 @@ function Navbar() {
                         <MenuIcon />
                     </IconButton>
 
-                    {/* flexGrow: 1 sayesinde bu kısım sol tarafı kaplar, geri kalanları sağa iter */}
                     <Typography variant="h6" sx={{ flexGrow: 1, textAlign: "left" }}>
                         <Link style={{ textDecoration: "none", boxShadow: "none", color: "white" }} to="/">
                             Home
                         </Link>
                     </Typography>
 
-                    {/* TEMA DEĞİŞTİRME BUTONU BURAYA EKLENDİ (Giriş yapıp yapmamaktan bağımsız) */}
+
                     <IconButton sx={{ mr: 4, color: 'white' }} onClick={toggleColorMode}>
                         {theme.palette.mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
                     </IconButton>
 
-                    {/* KULLANICI GİRİŞ/PROFİL KONTROLÜ */}
+
                     <Typography variant="h6" component="div">
                         {localStorage.getItem("currentUser") == null ?
                             <Link style={{ textDecoration: "none", boxShadow: "none", color: "white" }} to="/auth">
@@ -59,7 +60,13 @@ function Navbar() {
                                 <IconButton sx={{ color: 'white', mr: 2 }} onClick={onClick}>
                                     <LockOpen />
                                 </IconButton>
-                                <Link style={{ textDecoration: "none", boxShadow: "none", color: "white" }} to={"/users/" + localStorage.getItem("currentUser")}>
+
+                                <Link style={{ textDecoration: "none", boxShadow: "none", color: "white", display: "flex", alignItems: "center" }} to={"/users/" + localStorage.getItem("currentUser")}>
+                                    <img
+                                        src={`/avatars/avatar${currentAvatar}.png`}
+                                        alt="avatar"
+                                        style={{ width: 35, height: 35, borderRadius: '50%', marginRight: 10, objectFit: 'cover', backgroundColor: 'white' }}
+                                    />
                                     Profile
                                 </Link>
                             </Box>

@@ -33,6 +33,7 @@ function Auth() {
                     localStorage.setItem("refreshKey", result.refreshToken);
                     localStorage.setItem("currentUser", result.userId);
                     localStorage.setItem("userName", username);
+                    localStorage.setItem("avatarId", result.avatarId);
 
                     navigate(0);
                 } else {
